@@ -27,13 +27,15 @@ namespace TextHandler
 
         public ConcurrentDictionary<string, int> MultiThreadedResult(string text)
         {
-            dict = new ConcurrentDictionary<string, int>();
             const char V = '\n';
             string[] words = text.Split(new[] { '-', '.', '?', '!', ')', '(', ',', ':', ' ', '\"', '«', '»', V }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var word in words)
+            int counter = words.Length / 2;
+            int cnt = words.Length / 2;
+            var words_group = words.GroupBy(_ => counter++ / cnt).Select(v => v.ToArray()).ToArray();
+            foreach (var wrds in words_group)
             {
-                Thread thread = new Thread(new ParameterizedThreadStart(AddWord));
-                thread.Start(word);
+                Thread thread = new Thread(new ParameterizedThreadStart(AddWords));
+                thread.Start(wrds);
             }
             return dict;
         }
